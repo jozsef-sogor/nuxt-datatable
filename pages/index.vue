@@ -3,11 +3,10 @@
     v-row
       v-col(cols)
         DataTable(
-          v-if="items.length"
+          v-if="items.length || (!items.length && !loading)"
           :headers="headers"
           :items="items"
           :totalItems="totalItemsLength"
-          :currentPage="currentPage"
           :isLoading="isLoading"
           @updateTable="fetchData"
         )
@@ -32,7 +31,7 @@ export default {
       sales,
       items: [],
       totalItemsLength: 0,
-      currentPage: 1,
+      //currentPage: 1,
       isLoading: false,
       headers: [
         { text: 'Name', value: 'user', align: 'start' },
@@ -51,7 +50,7 @@ export default {
     //this.currentPage = response.currentPage
   },
   methods: {
-    async fetchData({page = 1, itemsPerPage = 10, sortBy = null, sortDesc = false, query = null}) {
+    async fetchData({page = 1, itemsPerPage = 10, sortBy = null, sortDesc = false, query = ''}) {
       //Set loading state to DataTable
       this.isLoading = true
       //Get queryString from options
@@ -77,15 +76,23 @@ export default {
       //Set delay
       await this.delay(3000)
       //Create response
+      reqParams.query.toLowerCase() //set query to lowercase for filtering
+      //If search query is present filter data, else use all of the data
+      const filteredResults = !reqParams.query 
+        ? await sales.results 
+        : await sales.results.filter((result) => 
+          result.user.first_name.toLowerCase().includes(reqParams.query) ||
+          result.user.last_name.toLowerCase().includes(reqParams.query) ||
+          result.email.toLowerCase().includes(reqParams.query)
+        )
       const start = (reqParams.page - 1) * reqParams.itemsPerPage //starting item in array
-      const resultsItems = await sales.results.slice(start, start + parseInt(reqParams.itemsPerPage))
-      const totalResultsLength = sales.results.length
-      //const filteredResults = []
+      const paginatedResults = filteredResults.slice(start, start + parseInt(reqParams.itemsPerPage))
+      const totalResultsLength = filteredResults.length
       const currentPage = reqParams.page
       const resultsObj = {
         total: totalResultsLength,
         currentPage: parseInt(currentPage) ,
-        data: resultsItems
+        data: paginatedResults
       }
 
       return resultsObj

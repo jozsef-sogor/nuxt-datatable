@@ -13,7 +13,7 @@
   ).elevation-1.mt-10
     template(v-slot:top)
       v-text-field(
-        v-model="search"
+        v-model="searchInput"
         label="Search data"
         class="mx-4"
       )
@@ -21,12 +21,17 @@
 
 <script>
 export default {
-  props: ['headers', 'items', 'totalItems', 'isLoading', 'currentPage'],
+  props: ['headers', 'items', 'totalItems', 'isLoading'],
   data() {
     return {
-      search: '',
+      searchInput: '',
       sortOptions: {}
     }
+  },
+  watch: {
+    searchInput() {
+      this.updateTable()
+    } 
   },
   methods: {
     updateTable() {
@@ -34,10 +39,11 @@ export default {
         page: this.sortOptions.page,
         itemsPerPage: this.sortOptions.itemsPerPage,
         sortBy: this.sortOptions.sortBy.length ? this.sortOptions.sortBy[0] : null,
-        sortDesc: this.sortOptions.sortDesc.length ? this.sortOptions.sortDesc[0] : false
+        sortDesc: this.sortOptions.sortDesc.length ? this.sortOptions.sortDesc[0] : false,
+        query: this.searchInput.toLowerCase()
       }
       this.$emit('updateTable', updatedOptions)
-    }
+    },
   }
 }
 </script>
