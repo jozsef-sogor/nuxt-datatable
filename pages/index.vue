@@ -37,9 +37,9 @@ export default {
         { text: 'Name', value: 'user', align: 'start', headerFilter: false },
         { text: 'Email', value: 'email', headerFilter: false },
         { text: 'Gender', value: 'gender', headerFilter: {type: 'select', options: this.findUniqueValues(sales.results, 'gender')} },
-        { text: 'Year', value: 'year', headerFilter: {type: 'range', min: 1970, max: 2030}},
-        { text: 'Sales', value: 'sales', headerFilter: {type: 'range', min: 0, max: 999999}},
-        { text: 'Country', value: 'country' },
+        { text: 'Year', value: 'year', headerFilter: {type: 'range', min: 1970, max: 2030} },
+        { text: 'Sales', value: 'sales', headerFilter: {type: 'range', min: 1, max: 999999} },
+        { text: 'Country', value: 'country', headerFilter: {type: 'select', options: this.findUniqueValues(sales.results, 'country')} },
       ]
     }
   },
