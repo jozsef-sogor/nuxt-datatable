@@ -114,7 +114,7 @@ export default {
       const updatedOptions = {
         page: resetPage ? 1 : this.sortOptions.page,
         itemsPerPage: this.sortOptions.itemsPerPage,
-        sortBy: this.sortOptions.sortBy.length ? this.sortOptions.sortBy[0] : null,
+        sortBy: this.sortOptions.sortBy.length ? this.sortOptions.sortBy[0] : '',
         sortDesc: this.sortOptions.sortDesc.length ? this.sortOptions.sortDesc[0] : false,
         query: this.searchInput ? this.searchInput : '',
         filters: this.columnFilters

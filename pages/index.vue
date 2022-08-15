@@ -50,7 +50,7 @@ export default {
     //this.currentPage = response.currentPage
   },
   methods: {
-    async fetchData({page = 1, itemsPerPage = 10, sortBy = null, sortDesc = false, query = '', filters = {}}) {
+    async fetchData({page = 1, itemsPerPage = 10, sortBy = '', sortDesc = false, query = '', filters = {}}) {
       //Set loading state to DataTable
       this.isLoading = true
       console.log(arguments)
@@ -75,13 +75,13 @@ export default {
     async mockServerCode(queryString) {
       //Get params object from query string
       const urlParams = new URLSearchParams(queryString)
-      console.log(urlParams)
       const reqParams = Object.fromEntries(urlParams)
       console.log(reqParams)
       //Set delay
       await this.delay(3000)
       //Create response
       reqParams.query.toLowerCase() //set query to lowercase for filtering
+
       //If search query is present filter data, else use all of the data
       const filteredResults = !reqParams.query 
         ? await sales.results 
@@ -90,6 +90,10 @@ export default {
           result.user.last_name.toLowerCase().includes(reqParams.query) ||
           result.email.toLowerCase().includes(reqParams.query)
         )
+      //Sort if required
+      reqParams.sortBy && filteredResults.sort(this.sortObjectsByValue(reqParams.sortBy, reqParams.sortDesc))
+
+      //Paginate results
       const start = (reqParams.page - 1) * reqParams.itemsPerPage //starting item in array
       const paginatedResults = filteredResults.slice(start, start + parseInt(reqParams.itemsPerPage))
       const totalResultsLength = filteredResults.length
@@ -107,6 +111,11 @@ export default {
     },
     findUniqueValues(array, property) {
       return [...new Set(array.map(item => item[property]))]
+    },
+    sortObjectsByValue(objValue, sortDesc = false) {
+      //const compare = (a, b) => a.localeCompare(b); //Only compares string
+      const compare = (a, b) => -(a < b) || +(a > b) //compares strings and numbers
+      return (a, b) => sortDesc == 'true' ? compare(b[objValue], a[objValue]) : compare(a[objValue], b[objValue])
     }
   }
 }
