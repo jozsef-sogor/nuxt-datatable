@@ -38,7 +38,7 @@ export default {
         { text: 'Email', value: 'email', headerFilter: false },
         { text: 'Gender', value: 'gender', headerFilter: {type: 'select', options: this.findUniqueValues(sales.results, 'gender')} },
         { text: 'Year', value: 'year', headerFilter: {type: 'range', min: 1970, max: 2030} },
-        { text: 'Sales', value: 'sales', headerFilter: {type: 'range', min: 1, max: 999999} },
+        { text: 'Sales', value: 'sales', headerFilter: {type: 'range', min: 1, max: 999999, step: 10000} },
         { text: 'Country', value: 'country', headerFilter: {type: 'select', options: this.findUniqueValues(sales.results, 'country')} },
       ]
     }
@@ -73,23 +73,45 @@ export default {
       this.isLoading = false
     },
     async mockServerCode(queryString) {
+      //Values the results can be sorted by
+      const filterableValues = ['gender', 'year', 'sales', 'country']
+
       //Get params object from query string
       const urlParams = new URLSearchParams(queryString)
       const reqParams = Object.fromEntries(urlParams)
       console.log(reqParams)
       //Set delay
       await this.delay(3000)
+
       //Create response
       reqParams.query.toLowerCase() //set query to lowercase for filtering
 
       //If search query is present filter data, else use all of the data
-      const filteredResults = !reqParams.query 
+      let filteredResults = !reqParams.query 
         ? await sales.results 
         : await sales.results.filter((result) => 
           result.user.first_name.toLowerCase().includes(reqParams.query) ||
           result.user.last_name.toLowerCase().includes(reqParams.query) ||
           result.email.toLowerCase().includes(reqParams.query)
         )
+      
+      //Filter if required
+      for(let entry of Object.entries(reqParams)) {
+        if(!entry[1]) continue //If the value is empty skip iteration
+        switch(entry[0]) {
+          case 'gender': 
+          case 'country':
+            const filterValues = entry[1].split(',')
+            filteredResults = filteredResults.filter(result => filterValues.includes(result[entry[0]]))
+            break
+          case 'year': 
+          case 'sales':
+            const [min, max] = entry[1].split(',')
+            filteredResults = filteredResults.filter(result => result[entry[0]] >= min && result[entry[0]] <= max)
+            break 
+        }
+      }
+
       //Sort if required
       reqParams.sortBy && filteredResults.sort(this.sortObjectsByValue(reqParams.sortBy, reqParams.sortDesc))
 

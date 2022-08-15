@@ -51,6 +51,7 @@
               v-model="columnFilters[singleHeader.value]"
               :max="singleHeader.headerFilter.max"
               :min="singleHeader.headerFilter.min"
+              :step="singleHeader.headerFilter.step ? singleHeader.headerFilter.step : 1"
               hide-details
             ).align-center.ma-2
               template(v-slot:prepend)
@@ -74,6 +75,7 @@
                   @change="$set(columnFilters[singleHeader.value], 1, $event)"
                 )
             v-btn(
+              v-if="singleHeader.headerFilter.type !== 'range'"
               @click="columnFilters[singleHeader.value] = ''"
               small
               text
