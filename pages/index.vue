@@ -3,7 +3,7 @@
     v-row
       v-col(cols)
         DataTable(
-          v-if="items.length || (!items.length && !loading)"
+          v-if="items.length || (!items.length && !isLoading)"
           :headers="headers"
           :items="items"
           :totalItems="totalItemsLength"
@@ -34,11 +34,11 @@ export default {
       //currentPage: 1,
       isLoading: false,
       headers: [
-        { text: 'Name', value: 'user', align: 'start' },
-        { text: 'Email', value: 'email' },
-        { text: 'Gender', value: 'gender' },
-        { text: 'Year', value: 'year' },
-        { text: 'Sales', value: 'sales' },
+        { text: 'Name', value: 'user', align: 'start', headerFilter: false },
+        { text: 'Email', value: 'email', headerFilter: false },
+        { text: 'Gender', value: 'gender', headerFilter: {type: 'select', options: this.findUniqueValues(sales.results, 'gender')} },
+        { text: 'Year', value: 'year', headerFilter: {type: 'range', min: 1970, max: 2030}},
+        { text: 'Sales', value: 'sales', headerFilter: {type: 'range', min: 0, max: 999999}},
         { text: 'Country', value: 'country' },
       ]
     }
@@ -50,17 +50,20 @@ export default {
     //this.currentPage = response.currentPage
   },
   methods: {
-    async fetchData({page = 1, itemsPerPage = 10, sortBy = null, sortDesc = false, query = ''}) {
+    async fetchData({page = 1, itemsPerPage = 10, sortBy = null, sortDesc = false, query = '', filters = {}}) {
       //Set loading state to DataTable
       this.isLoading = true
+      console.log(arguments)
       //Get queryString from options
       const queryString = new URLSearchParams({
         page: page,
         itemsPerPage: itemsPerPage,
         sortBy: sortBy,
         sortDesc: sortDesc,
-        query: query
+        query: query,
+        ...filters
       }).toString()
+      console.log(queryString)
       //Mock API call
       const response = await this.mockServerCode(`?${queryString}`)
       this.items = response.data
@@ -72,7 +75,9 @@ export default {
     async mockServerCode(queryString) {
       //Get params object from query string
       const urlParams = new URLSearchParams(queryString)
+      console.log(urlParams)
       const reqParams = Object.fromEntries(urlParams)
+      console.log(reqParams)
       //Set delay
       await this.delay(3000)
       //Create response
@@ -99,6 +104,9 @@ export default {
     },
     delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms))
+    },
+    findUniqueValues(array, property) {
+      return [...new Set(array.map(item => item[property]))]
     }
   }
 }
