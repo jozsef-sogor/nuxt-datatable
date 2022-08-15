@@ -85,6 +85,7 @@
 </template>
 
 <script>
+import { debounce } from '~/helpers'
 export default {
   props: ['headers', 'items', 'totalItems', 'isLoading'],
   data() {
