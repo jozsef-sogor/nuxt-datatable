@@ -101,7 +101,6 @@ export default {
     }, 750),
     columnFilters: {
       handler: debounce(function() {
-        console.log(this.columnFilters)
         this.updateTable(true)
       }, 750),
       deep: true
