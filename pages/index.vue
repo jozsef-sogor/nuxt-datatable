@@ -43,6 +43,16 @@ export default {
       ]
     }
   },
+  computed: {
+    computedItems() {
+      return this.items.length
+        ? this.items.map(item => {
+            item.user = `${item.user.first_name} ${item.user.last_name}`
+            return item
+          })
+        : []
+    }
+  },
   async created() {
     await this.fetchData({})
     //this.items = response.data
