@@ -96,14 +96,14 @@ export default {
     }
   },
   watch: {
-    searchInput() {
+    searchInput: debounce(function() {
       this.updateTable()
-    },
+    }, 750),
     columnFilters: {
-      handler() {
+      handler: debounce(function() {
         console.log(this.columnFilters)
         this.updateTable(true)
-      },
+      }, 750),
       deep: true
     }
   },
