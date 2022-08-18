@@ -46,8 +46,7 @@ export default {
   computed: {
     computedItems() {
       const flattenedNamedItems = this.items.map(item => {
-                                    if(typeof item.user === 'string') return {...item}
-                                    item.user = `${item.user.first_name} ${item.user.last_name}`
+                                    if(typeof item.user !== 'string') item.user = `${item.user.first_name} ${item.user.last_name}`
                                     return {...item}
                                   })
       return this.items.length

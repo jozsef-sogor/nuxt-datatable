@@ -106,11 +106,6 @@ export default {
       deep: true
     }
   },
-  computed: {
-    flattenedColumnFilters() {
-      return null
-    }
-  },
   methods: {
     updateTable(resetPage = false) {
       const updatedOptions = {
